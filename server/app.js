@@ -110,7 +110,7 @@ async function createApp() {
       return;
     }
 
-    const sessionId = request.cookies.sid || createSessionId();
+    const sessionId = createSessionId();
 
     await db.run("DELETE FROM sessions WHERE id = ?", [sessionId]);
     await db.run(
@@ -119,7 +119,9 @@ async function createApp() {
     );
 
     response.cookie("sid", sessionId, {
-      path: "/"
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax"
     });
 
     response.json({
