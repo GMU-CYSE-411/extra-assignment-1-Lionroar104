@@ -1,5 +1,5 @@
-async function loadSettings(userId) {
-  const result = await api(`/api/settings?userId=${encodeURIComponent(userId)}`);
+async function loadSettings() {
+  const result = await api("/api/settings");
   const settings = result.settings;
 
   document.getElementById("settings-form-user-id").value = settings.userId;
@@ -10,10 +10,20 @@ async function loadSettings(userId) {
   form.elements.theme.value = settings.theme;
   form.elements.statusMessage.value = settings.statusMessage;
   form.elements.emailOptIn.checked = Boolean(settings.emailOptIn);
-  document.getElementById("status-preview").innerHTML = `
-    <p><strong>${settings.displayName}</strong></p>
-    <p>${settings.statusMessage}</p>
-  `;
+
+  const pview = document.getElementById("status-preview");
+  pview.innerHTML = "";
+
+  const nLine = document.createElement("p");
+  const sName = document.createElement("strong");
+  sName.textContent = settings.displayName;
+  nLine.appendChild(sName);
+
+  const sLine = document.createElement("p");
+  sLine.textContent = settings.statusMessage;
+
+  pview.appendChild(nLine);
+  pview.appendChild(sLine);
 
   writeJson("settings-output", settings);
 }
@@ -27,7 +37,7 @@ async function loadSettings(userId) {
       return;
     }
 
-    await loadSettings(user.id);
+    await loadSettings();
   } catch (error) {
     writeJson("settings-output", { error: error.message });
   }
@@ -35,8 +45,7 @@ async function loadSettings(userId) {
 
 document.getElementById("settings-query-form").addEventListener("submit", async (event) => {
   event.preventDefault();
-  const formData = new FormData(event.currentTarget);
-  await loadSettings(formData.get("userId"));
+  await loadSettings();
 });
 
 document.getElementById("settings-form").addEventListener("submit", async (event) => {
@@ -44,7 +53,6 @@ document.getElementById("settings-form").addEventListener("submit", async (event
 
   const formData = new FormData(event.currentTarget);
   const payload = {
-    userId: formData.get("userId"),
     displayName: formData.get("displayName"),
     theme: formData.get("theme"),
     statusMessage: formData.get("statusMessage"),
@@ -57,7 +65,7 @@ document.getElementById("settings-form").addEventListener("submit", async (event
   });
 
   writeJson("settings-output", result);
-  await loadSettings(payload.userId);
+  await loadSettings();
 });
 
 document.getElementById("enable-email").addEventListener("click", async () => {
