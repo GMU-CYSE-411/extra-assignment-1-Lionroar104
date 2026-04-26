@@ -1,12 +1,26 @@
-function noteCard(note) {
-  return `
-    <article class="note-card">
-      <h3>${note.title}</h3>
-      <p class="note-meta">Owner: ${note.ownerUsername} | ID: ${note.id} | Pinned: ${note.pinned}</p>
-      <div class="note-body">${note.body}</div>
-    </article>
-  `;
+function createNoteCard(note) {
+  const a = document.createElement("article");
+  a.className = "note-card";
+
+  const t = document.createElement("h3");
+  t.textContent = note.title;
+
+  const m = document.createElement("p");
+  m.className = "note-meta";
+  m.textContent = `Owner: ${note.ownerUsername} | ID: ${note.id} | Pinned: ${note.pinned}`;
+
+  const b = document.createElement("div");
+  b.className = "note-body";
+  b.textContent = note.body;
+
+  a.appendChild(t);
+  a.appendChild(m);
+  a.appendChild(b);
+
+  return a;
 }
+
+  
 
 async function loadNotes(ownerId, search) {
   const query = new URLSearchParams();
