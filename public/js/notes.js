@@ -22,12 +22,8 @@ function createNoteCard(note) {
 
   
 
-async function loadNotes(ownerId, search) {
+async function loadNotes(_ownerId, search) {
   const query = new URLSearchParams();
-
-  if (ownerId) {
-    query.set("ownerId", ownerId);
-  }
 
   if (search) {
     query.set("search", search);
@@ -35,8 +31,14 @@ async function loadNotes(ownerId, search) {
 
   const result = await api(`/api/notes?${query.toString()}`);
   const notesList = document.getElementById("notes-list");
-  notesList.innerHTML = result.notes.map(noteCard).join("");
+  
+  notesList.innerHTML = "";
+
+  result.notes.forEach((note) => {
+    notesList.appendChild(createNoteCard(note));
+  });
 }
+
 
 (async function bootstrapNotes() {
   try {
@@ -67,7 +69,6 @@ document.getElementById("create-note-form").addEventListener("submit", async (ev
 
   const formData = new FormData(event.currentTarget);
   const payload = {
-    ownerId: formData.get("ownerId"),
     title: formData.get("title"),
     body: formData.get("body"),
     pinned: formData.get("pinned") === "on"
@@ -78,7 +79,6 @@ document.getElementById("create-note-form").addEventListener("submit", async (ev
     body: JSON.stringify(payload)
   });
 
-  await loadNotes(payload.ownerId, "");
+  await loadNotes(null, "");
   event.currentTarget.reset();
-  document.getElementById("create-owner-id").value = payload.ownerId;
 });
